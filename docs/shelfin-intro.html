@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>ShelfIn — Presentation</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg: #0c0d10;
+      --text: #f4f5f7;
+      --muted: #9aa0ad;
+      --line: #2a2d36;
+      --accent: #9b7dff;
+      --ok: #5ecf8e;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html, body {
+      height: 100%;
+      overflow: hidden;
+      background: var(--bg);
+      color: var(--text);
+      font-family: "IBM Plex Sans", system-ui, sans-serif;
+    }
+
+    .slide {
+      height: 100%;
+      max-width: 1280px;
+      margin: 0 auto;
+      padding: clamp(2rem, 6vh, 4rem) clamp(1.75rem, 6vw, 5rem);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    .eyebrow {
+      font-size: clamp(0.8rem, 1.2vw, 0.95rem);
+      font-weight: 600;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: var(--accent);
+    }
+
+    .title {
+      margin-top: 0.85rem;
+      font-size: clamp(3rem, 8vw, 5.5rem);
+      font-weight: 700;
+      letter-spacing: -0.04em;
+      line-height: 0.95;
+    }
+
+    .headline {
+      margin-top: 1.25rem;
+      font-size: clamp(1.35rem, 2.8vw, 2rem);
+      font-weight: 500;
+      letter-spacing: -0.02em;
+      line-height: 1.25;
+      max-width: 18ch;
+    }
+
+    .support {
+      margin-top: 0.85rem;
+      font-size: clamp(1rem, 1.6vw, 1.2rem);
+      line-height: 1.45;
+      color: var(--muted);
+      max-width: 36ch;
+    }
+
+    .points {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: clamp(1.5rem, 4vw, 3rem);
+      border-top: 1px solid var(--line);
+      padding-top: clamp(1.25rem, 3vh, 2rem);
+    }
+
+    .point strong {
+      display: block;
+      font-size: clamp(1.05rem, 1.8vw, 1.25rem);
+      font-weight: 600;
+      margin-bottom: 0.45rem;
+      letter-spacing: -0.01em;
+    }
+
+    .point.access strong { color: var(--ok); }
+    .point.shelf strong { color: var(--accent); }
+
+    .point p {
+      font-size: clamp(0.95rem, 1.4vw, 1.1rem);
+      line-height: 1.45;
+      color: var(--muted);
+      max-width: 34ch;
+    }
+
+    .board {
+      margin-top: auto;
+      padding-top: 1.5rem;
+      font-size: 0.9rem;
+      color: var(--muted);
+    }
+
+    .board b {
+      color: var(--text);
+      font-weight: 600;
+    }
+
+    @media (max-width: 700px) {
+      .points { grid-template-columns: 1fr; }
+      .headline { max-width: none; }
+    }
+  </style>
+</head>
+<body>
+  <div class="slide">
+    <header>
+      <p class="eyebrow">Moorcheh · Ventuno Q</p>
+      <h1 class="title">ShelfIn</h1>
+      <p class="headline">Access control and shelf guidance.</p>
+      <p class="support">
+        Identity at the gate. Placement on the shelf.
+        One camera. One board.
+      </p>
+    </header>
+
+    <section class="points">
+      <article class="point access">
+        <strong>Access</strong>
+        <p>Verifies a person’s identity and can grant access at a gate - no badge, no ID, just a camera.</p>
+      </article>
+      <article class="point shelf">
+        <strong>Shelf guidance</strong>
+        <p>Helps place products correctly on shelves in retail and warehouse environments.</p>
+      </article>
+    </section>
+
+    <p class="board">Running on <b>Ventuno Q</b></p>
+  </div>
+</body>
+</html>

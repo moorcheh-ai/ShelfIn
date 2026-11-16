@@ -1,0 +1,31 @@
+faceenv/
+.venv/
+venv/
+__pycache__/
+*.py[cod]
+.DS_Store
+.env
+.env.*
+!.env.example
+
+# Large / local model weights (download via scripts/download_models.*)
+models/*.onnx
+!models/.gitkeep
+
+# Enrolled face photos stay local — never commit personal images
+known_faces/**
+!known_faces/.gitkeep
+
+# Enrolled product photos stay local
+known_objects/**
+!known_objects/.gitkeep
+
+
+# Local Edge / cache
+*.npz
+*.pt
+*.tflite
+data/
+.moorcheh-edge/
+
+.wsl-export

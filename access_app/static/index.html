@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>ShelfIn</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/static/styles.css" />
+  <link rel="icon" href="/static/brand/moorcheh-logo.png" type="image/png" />
+</head>
+<body>
+  <div class="app">
+    <header class="top">
+      <div class="brand">
+        <img class="brand-logo" src="/static/brand/moorcheh-logo.png" alt="Moorcheh" width="48" height="48" />
+        <div>
+          <p class="brand-name">Moorcheh</p>
+          <h1>ShelfIn</h1>
+          <p class="sub">Access control · shelf guidance</p>
+        </div>
+      </div>
+      <div class="meta" id="meta">
+        <span id="edgePill" class="pill">Edge…</span>
+        <span id="camPill" class="pill">Camera…</span>
+      </div>
+    </header>
+
+    <main class="grid">
+      <section class="panel live">
+        <div class="panel-head">
+          <h2>Live view</h2>
+          <p>Known face grants access. A known item names its shelf.</p>
+        </div>
+        <div class="viewport">
+          <img id="stream" src="/api/stream" alt="Live camera" />
+          <div id="gateOverlay" class="gate-overlay waiting" aria-live="polite">
+            <div id="banner" class="banner waiting">WAITING</div>
+          </div>
+        </div>
+        <div class="status-row">
+          <div>
+            <div class="label">Decision</div>
+            <div id="decision" class="decision">-</div>
+          </div>
+          <div>
+            <div class="label">Identity</div>
+            <div id="identity" class="mono">Unknown</div>
+          </div>
+          <div>
+            <div class="label">Score</div>
+            <div id="score" class="mono">-</div>
+          </div>
+        </div>
+        <p id="message" class="message">Starting camera…</p>
+      </section>
+
+      <section class="panel onboard">
+        <div class="panel-head">
+          <h2>Onboard a person</h2>
+          <p>Set a name, add several photos, insert into the gallery.</p>
+        </div>
+        <form id="enrollForm">
+          <label>
+            Display name
+            <input id="personName" name="name" type="text" placeholder="e.g. Alex" required maxlength="64" autocomplete="off" />
+          </label>
+          <label class="drop" id="dropZone">
+            <input id="photoInput" name="photos" type="file" accept="image/*" multiple required />
+            <span id="dropText">Drop photos here or click to choose</span>
+            <span class="hint">JPG / PNG · multiple files OK</span>
+          </label>
+          <ul id="fileList" class="file-list"></ul>
+          <button type="submit" id="enrollBtn">Insert &amp; authorize</button>
+          <p id="enrollMsg" class="enroll-msg" hidden></p>
+        </form>
+
+        <div class="panel-head gallery-head">
+          <h2>Known faces</h2>
+          <button type="button" id="refreshFaces" class="ghost">Refresh</button>
+        </div>
+        <ul id="peopleList" class="people"></ul>
+
+        <div class="panel-head gallery-head">
+          <h2>Add an item</h2>
+          <p>Name, shelf, and a photo. The live view says where it belongs.</p>
+        </div>
+        <form id="objectForm">
+          <label>
+            Item name
+            <input id="itemName" name="name" type="text" placeholder="e.g. Mug" required maxlength="64" autocomplete="off" />
+          </label>
+          <label>
+            Shelf
+            <input id="itemShelf" name="shelf" type="text" placeholder="e.g. the drinkware shelf" required maxlength="64" autocomplete="off" />
+          </label>
+          <label>
+            Description (optional)
+            <input id="itemDescription" name="description" type="text" placeholder="e.g. ceramic coffee mug" maxlength="64" autocomplete="off" />
+          </label>
+          <label class="drop" id="itemDrop">
+            <input id="itemPhotos" name="photos" type="file" accept="image/*" multiple required />
+            <span id="itemDropText">Drop item photos or click to choose</span>
+            <span class="hint">JPG / PNG</span>
+          </label>
+          <ul id="itemFileList" class="file-list"></ul>
+          <button type="submit" id="itemBtn">Add item</button>
+          <p id="itemMsg" class="enroll-msg" hidden></p>
+        </form>
+        <ul id="itemList" class="people"></ul>
+      </section>
+    </main>
+  </div>
+  <script src="/static/app.js"></script>
+</body>
+</html>

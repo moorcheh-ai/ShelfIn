@@ -1,0 +1,27 @@
+{
+  "Axe deodorant": {
+    "say": "Axe deodorant",
+    "shelf": "the personal care shelf",
+    "description": "Black Axe body spray can, deodorant for personal care."
+  },
+  "Coffee cup": {
+    "say": "Coffee cup",
+    "shelf": "the drinkware shelf",
+    "description": "White ceramic coffee mug for hot drinks."
+  },
+  "House key": {
+    "say": "House key",
+    "shelf": "the keys and hardware shelf",
+    "description": "Brass house key for the front door."
+  },
+  "Mouse": {
+    "say": "Mouse",
+    "shelf": "the computer accessories shelf",
+    "description": "Black wireless computer mouse."
+  },
+  "Smart watch": {
+    "say": "Smart watch",
+    "shelf": "the wearables shelf",
+    "description": "Smart watch with a dark mesh band."
+  }
+}
