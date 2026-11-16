@@ -1,4 +1,4 @@
-"""Face Access web app — live auth + onboarding enroll."""
+"""ShelfIn web app - live access + shelf guidance + onboarding."""
 
 from __future__ import annotations
 

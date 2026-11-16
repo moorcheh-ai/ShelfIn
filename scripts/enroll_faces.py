@@ -1,8 +1,22 @@
+"""Bulk-enroll faces from known_faces/ into Moorcheh Edge (:8083).
+
+Run from repo root:
+  python scripts/enroll_faces.py
+"""
+
+from __future__ import annotations
+
 import os
+import sys
+from pathlib import Path
+
+ROOT = Path(__file__).resolve().parent.parent
+if str(ROOT) not in sys.path:
+    sys.path.insert(0, str(ROOT))
 
 from moorcheh_edge import MoorchehEdgeApiClient, MoorchehEdgeApiError
 
-from face_embedder import FaceEmbedder
+from core.face_embedder import FaceEmbedder
 
 BASE_URL = os.environ.get("MOORCHEH_BASE_URL", "http://localhost:8083")
 
@@ -13,7 +27,7 @@ try:
 except MoorchehEdgeApiError as exc:
     raise RuntimeError(
         f"Could not reach Moorcheh Edge at {BASE_URL}. "
-        "Start it with: moorcheh-edge up"
+        "Start it with: bash ./start_faces_edge.sh"
     ) from exc
 
 print(
@@ -24,19 +38,19 @@ print(
 embedder = FaceEmbedder()
 
 items = []
-root = "known_faces"
+root = ROOT / "known_faces"
 
 for person_name in os.listdir(root):
-    person_dir = os.path.join(root, person_name)
-    if not os.path.isdir(person_dir):
+    person_dir = root / person_name
+    if not person_dir.is_dir():
         continue
 
     for fname in os.listdir(person_dir):
         if not fname.lower().endswith((".jpg", ".jpeg", ".png")):
             continue
 
-        path = os.path.join(person_dir, fname)
-        emb = embedder.embed_path(path)
+        path = person_dir / fname
+        emb = embedder.embed_path(str(path))
         if emb is None:
             print(f"Skipping {path} (no face found)")
             continue

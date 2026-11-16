@@ -1,11 +1,23 @@
-"""Enroll known objects into Moorcheh Edge objects store (port 8081)."""
+"""Bulk-enroll objects from known_objects/ into Moorcheh Edge (:8081).
+
+Run from repo root:
+  python scripts/enroll_objects.py
+"""
+
+from __future__ import annotations
 
 import os
+import sys
+from pathlib import Path
+
+ROOT = Path(__file__).resolve().parent.parent
+if str(ROOT) not in sys.path:
+    sys.path.insert(0, str(ROOT))
 
 from moorcheh_edge import MoorchehEdgeApiClient, MoorchehEdgeApiError
 
-from object_embedder import EMBED_DIM, ObjectEmbedder
-from retail_guide import save_catalog_entry
+from core.object_embedder import EMBED_DIM, ObjectEmbedder
+from core.retail_guide import save_catalog_entry
 
 BASE_URL = os.environ.get("MOORCHEH_OBJECTS_URL", "http://localhost:8081")
 
@@ -16,7 +28,7 @@ try:
 except MoorchehEdgeApiError as exc:
     raise RuntimeError(
         f"Could not reach objects Edge at {BASE_URL}. "
-        "Start it with: ./start_objects_edge.sh"
+        "Start it with: bash ./start_objects_edge.sh"
     ) from exc
 
 print(
@@ -26,26 +38,26 @@ print(
 if health.get("dimension") not in (None, EMBED_DIM):
     raise RuntimeError(
         f"Objects store dimension is {health.get('dimension')}, expected {EMBED_DIM}. "
-        "Clear it first: curl -X DELETE http://localhost:8081/store"
+        "Clear it first: moorcheh-edge clear-store -y --base-url http://localhost:8081"
     )
 
 embedder = ObjectEmbedder()
 items = []
-root = "known_objects"
+root = ROOT / "known_objects"
 
 for object_name in sorted(os.listdir(root)):
-    object_dir = os.path.join(root, object_name)
-    if not os.path.isdir(object_dir):
+    object_dir = root / object_name
+    if not object_dir.is_dir():
         continue
 
-    shelf_note = os.path.join(object_dir, "shelf.txt")
+    shelf_note = object_dir / "shelf.txt"
     shelf = ""
-    if os.path.isfile(shelf_note):
+    if shelf_note.is_file():
         with open(shelf_note, encoding="utf-8") as handle:
             shelf = handle.readline().strip()
-    desc_note = os.path.join(object_dir, "description.txt")
+    desc_note = object_dir / "description.txt"
     description = ""
-    if os.path.isfile(desc_note):
+    if desc_note.is_file():
         with open(desc_note, encoding="utf-8") as handle:
             description = handle.readline().strip()
     if shelf or description:
@@ -55,8 +67,8 @@ for object_name in sorted(os.listdir(root)):
         if not fname.lower().endswith((".jpg", ".jpeg", ".png")):
             continue
 
-        path = os.path.join(object_dir, fname)
-        emb = embedder.embed_path(path)
+        path = object_dir / fname
+        emb = embedder.embed_path(str(path))
         if emb is None:
             print(f"Skipping {path} (could not read image)")
             continue

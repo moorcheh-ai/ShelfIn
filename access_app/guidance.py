@@ -16,7 +16,7 @@ from access_app.config import (
     LLM_MODEL,
     LLM_TIMEOUT_S,
 )
-from retail_guide import guidance_line
+from core.retail_guide import guidance_line
 
 
 def build_guidance(

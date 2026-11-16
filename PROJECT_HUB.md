@@ -22,7 +22,7 @@ Everything that matters for matching stays on the board: models, vectors, and de
 
 Powered by **Moorcheh** - PyPI `moorcheh-edge`, Docker `moorcheh/moorcheh-edge`, docs at [docs.moorcheh.ai/on-edge](https://docs.moorcheh.ai/on-edge).
 
-**Repo:** [github.com/moorcheh-ai/moorcheh-face-access](https://github.com/moorcheh-ai/moorcheh-face-access)
+**Repo:** [github.com/moorcheh-ai/ShelfIn](https://github.com/moorcheh-ai/ShelfIn)
 
 **Demo video:** _Add link when the demo cut is ready._
 
@@ -148,10 +148,10 @@ For larger galleries, skip the UI and run scripts:
 
 ```bash
 # Faces: photos already under known_faces/<Name>/
-python enroll_faces.py
+python scripts/enroll_faces.py
 
 # Objects: photos + shelf.txt + description.txt under known_objects/<Item>/
-python enroll_objects.py
+python scripts/enroll_objects.py
 ```
 
 Face and object images stay on the device (`known_faces/` and `known_objects/` are gitignored).
@@ -213,7 +213,7 @@ Defaults (set by `start.sh` / `config.py` - no exports required):
 
 - Dual Moorcheh Edge stores
 - Optional external LLM guidance + Piper / espeak TTS
-- Scripts: `start_faces_edge.sh`, `start_objects_edge.sh`, `start.sh`, `enroll_faces.py`, `enroll_objects.py`
+- Scripts: `start_faces_edge.sh`, `start_objects_edge.sh`, `start.sh`, `scripts/enroll_faces.py`, `scripts/enroll_objects.py`
 
 ---
 
@@ -248,7 +248,7 @@ Defaults (set by `start.sh` / `config.py` - no exports required):
 
 ### One-time setup
 
-1. Clone [github.com/moorcheh-ai/moorcheh-face-access](https://github.com/moorcheh-ai/moorcheh-face-access)
+1. Clone [github.com/moorcheh-ai/ShelfIn](https://github.com/moorcheh-ai/ShelfIn)
 2. Install Docker; add your user to the `docker` group
 3. Create venv and install deps
 4. Download face models; place `yolov8n.pt` in the project root
@@ -257,8 +257,8 @@ Defaults (set by `start.sh` / `config.py` - no exports required):
 
 ```bash
 cd ~
-git clone https://github.com/moorcheh-ai/moorcheh-face-access.git
-cd moorcheh-face-access
+git clone https://github.com/moorcheh-ai/ShelfIn.git
+cd ShelfIn
 python3 -m venv faceenv && source faceenv/bin/activate
 pip install -U pip
 pip install -r requirements-retail.txt
@@ -271,7 +271,7 @@ bash ./scripts/download_models.sh
 Camera, thresholds, `XDG_RUNTIME_DIR`, and Piper autodetection are already defaults in `start.sh`.
 
 ```bash
-cd ~/moorcheh-face-access
+cd ~/ShelfIn
 source faceenv/bin/activate
 bash ./start_faces_edge.sh
 bash ./start_objects_edge.sh
@@ -319,7 +319,7 @@ Edge docs: [docs.moorcheh.ai/on-edge](https://docs.moorcheh.ai/on-edge)
 
 ## Links
 
-- ShelfIn / Face Access - https://github.com/moorcheh-ai/moorcheh-face-access
+- ShelfIn - https://github.com/moorcheh-ai/ShelfIn
 - Moorcheh Edge - https://github.com/moorcheh-ai/moorcheh-edge
 - Documentation - https://docs.moorcheh.ai/on-edge/
 - PyPI - https://pypi.org/project/moorcheh-edge/

@@ -11,8 +11,8 @@ import cv2
 import numpy as np
 from moorcheh_edge import MoorchehEdgeApiClient, MoorchehEdgeApiError
 
-from camera_capture import Camera
-from face_embedder import FaceEmbedder
+from core.camera_capture import Camera
+from core.face_embedder import FaceEmbedder
 
 from access_app.config import (
     BASE_URL,
@@ -30,7 +30,7 @@ from access_app.config import (
 )
 from access_app.guidance import build_guidance
 from access_app.object_watch import ObjectWatch
-from retail_guide import RetailVoice
+from core.retail_guide import RetailVoice
 
 
 @dataclass

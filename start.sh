@@ -1,14 +1,14 @@
 #!/usr/bin/env bash
-# Start Face Access UI (assumes faces Edge is already up on :8083)
+# Start ShelfIn UI (assumes faces Edge is already up on :8083)
 # Usage:
 #   bash ./start_faces_edge.sh    # faces store :8083
 #   bash ./start_objects_edge.sh  # objects store :8081
-#   bash ./start.sh               # Face Access UI
+#   bash ./start.sh               # ShelfIn UI
 set -eu
 
 ROOT="$(cd "$(dirname "$0")" && pwd)"
 cd "$ROOT"
-sed -i 's/\r$//' "$ROOT/start.sh" "$ROOT/run_access_app.sh" 2>/dev/null || true
+sed -i 's/\r$//' "$ROOT/start.sh" 2>/dev/null || true
 
 # Defaults so day-to-day is: start Edge stores, then bash ./start.sh
 export CAMERA_BACKEND="${CAMERA_BACKEND:-opencv}"
@@ -63,7 +63,7 @@ fi
 if [[ ! -f faceenv/bin/activate ]]; then
   echo "[start] Missing faceenv/. Create once:"
   echo "  python3 -m venv faceenv && source faceenv/bin/activate"
-  echo "  pip install -r requirements.txt"
+  echo "  pip install -r requirements-retail.txt"
   echo "  bash ./scripts/download_models.sh"
   exit 1
 fi

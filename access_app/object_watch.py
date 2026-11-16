@@ -13,7 +13,7 @@ from typing import Any
 
 import numpy as np
 
-from retail_guide import load_catalog
+from core.retail_guide import load_catalog
 
 # Same skip set spirit as Moorcheh-Face (person / vehicles / furniture).
 _SKIP_CLASSES = {
@@ -221,7 +221,7 @@ class ObjectWatch:
     def _ensure_embed(self) -> bool:
         try:
             if self._embedder is None:
-                from object_embedder import ObjectEmbedder
+                from core.object_embedder import ObjectEmbedder
 
                 print("[object-watch] loading object embedder …")
                 self._embedder = ObjectEmbedder()

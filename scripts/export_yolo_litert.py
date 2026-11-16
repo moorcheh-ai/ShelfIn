@@ -1,14 +1,14 @@
 #!/usr/bin/env python3
-"""Export YOLOv8n to LiteRT (.tflite) for Face Access object boxes.
+"""Export YOLOv8n to LiteRT (.tflite) for ShelfIn object boxes.
 
-Ultralytics LiteRT export only works on Mac or Linux x86_64 — not Windows,
+Ultralytics LiteRT export only works on Mac or Linux x86_64 - not Windows,
 not aarch64 boards. On Windows, use WSL Ubuntu:
 
   wsl
-  cd /mnt/c/Users/patel/Downloads/Edge\\ AI/moorcheh-face-access
+  cd /mnt/c/Users/patel/Downloads/Edge\\ AI/shelfin
   python3 -m venv .wsl-export && source .wsl-export/bin/activate
   pip install ultralytics
-  python export_yolo_litert.py
+  python scripts/export_yolo_litert.py
 
 Then place yolov8n.tflite in the board project root (OBJECT_DETECTOR=auto|litert).
 Until then, the board uses Torch yolov8n.pt automatically.
@@ -22,7 +22,7 @@ from pathlib import Path
 
 from ultralytics import YOLO
 
-ROOT = Path(__file__).resolve().parent
+ROOT = Path(__file__).resolve().parent.parent
 PT = ROOT / "yolov8n.pt"
 OUT = ROOT / "yolov8n.tflite"
 IMGSZ = 256
@@ -37,7 +37,7 @@ def main() -> None:
             f"({platform.system()} {platform.machine()}).\n"
             "Use WSL Ubuntu or a Mac/Linux x86_64 machine, then put "
             "yolov8n.tflite in the project root on the board.\n"
-            "Meanwhile Face Access falls back to Torch yolov8n.pt "
+            "Meanwhile ShelfIn falls back to Torch yolov8n.pt "
             "(OBJECT_DETECTOR=auto).",
             file=sys.stderr,
         )

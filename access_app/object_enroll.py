@@ -11,7 +11,7 @@ import numpy as np
 from moorcheh_edge import MoorchehEdgeApiClient, MoorchehEdgeApiError
 
 from access_app.config import KNOWN_OBJECTS_DIR, OBJECTS_URL
-from retail_guide import load_catalog, save_catalog_entry
+from core.retail_guide import load_catalog, save_catalog_entry
 
 _SAFE = re.compile(r"[^A-Za-z0-9 _.-]+")
 _IMAGE_EXT = {".jpg", ".jpeg", ".png", ".webp"}
@@ -79,7 +79,7 @@ def enroll_item_images(
     save_catalog_entry(item, place, note)
 
     try:
-        from object_embedder import ObjectEmbedder
+        from core.object_embedder import ObjectEmbedder
     except ImportError as exc:
         raise RuntimeError(
             "Object embedding is not installed in this environment. "

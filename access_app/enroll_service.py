@@ -10,7 +10,7 @@ import cv2
 import numpy as np
 from moorcheh_edge import MoorchehEdgeApiClient, MoorchehEdgeApiError
 
-from face_embedder import FaceEmbedder
+from core.face_embedder import FaceEmbedder
 
 from access_app.config import BASE_URL, KNOWN_FACES_DIR
 

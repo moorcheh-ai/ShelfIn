@@ -14,7 +14,7 @@ OBJECTS_URL = os.environ.get("MOORCHEH_OBJECTS_URL", "http://localhost:8081").rs
 HOST = os.environ.get("FACE_ACCESS_HOST", "0.0.0.0")
 PORT = int(os.environ.get("FACE_ACCESS_PORT", "8501"))
 
-# Identity match (same default as live_face_id.py)
+# Identity match threshold for ACCESS GRANTED
 MATCH_THRESHOLD = float(os.environ.get("FACE_MATCH_THRESHOLD", "0.28"))
 DETECT_SCORE_THRESHOLD = float(os.environ.get("FACE_DETECT_THRESHOLD", "0.5"))
 SEARCH_TOP_K = int(os.environ.get("FACE_SEARCH_TOP_K", "3"))

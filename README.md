@@ -1,43 +1,39 @@
-# ShelfIn (Moorcheh Face Access)
+# ShelfIn
 
-Real-time **access control** and **shelf guidance** on **Ventuno Q** (USB webcam + speaker + browser UI):
+Access control and shelf guidance on **Ventuno Q** (USB webcam + speaker + browser UI).
 
 - **YuNet / SFace** → faces Edge `:8083` → ACCESS GRANTED / DENIED
-- **YOLO / ResNet** → objects Edge `:8081` → known item name (unknown = box only)
-- Optional **external LLM** rewrites shelf lines from enrolled facts already in memory
-- **Piper / espeak** speaks on the board speaker
-- Web UI on `:8501` for live stream + enroll
+- **YOLO / ResNet** → objects Edge `:8081` → known item + shelf line
+- Optional external LLM for spoken rewrite; **Piper / espeak** on the speaker
+- Web UI on `:8501`
 
-Product story and architecture: **[PROJECT_HUB.md](./PROJECT_HUB.md)**  
-Architecture diagrams (Figma): [VENTUNO Face Access - System Architecture](https://www.figma.com/design/4ZReJYcUDZaEkj22gzJerR/VENTUNO-Face-Access-%E2%80%94-System-Architecture)
+Product story: **[PROJECT_HUB.md](./PROJECT_HUB.md)**
 
----
+## Layout
 
-## What you need
-
-| Need | Why |
-|------|-----|
-| Git | Clone this repo |
-| Docker | Moorcheh Edge faces + objects |
-| Python 3.10+ | App + OpenCV (+ ultralytics) |
-| USB webcam | Live gate |
-| Speaker | Piper / espeak |
-| Network | UI at `http://<board-ip>:8501/` |
-
----
+```text
+shelfin/
+  access_app/     # FastAPI dashboard + enroll APIs
+  core/           # camera, face/object embed, TTS helpers
+  scripts/        # bulk enroll, model download, LiteRT export
+  known_faces/    # local face photos (gitignored)
+  known_objects/  # local item photos (gitignored)
+  models/         # YuNet / SFace ONNX (gitignored weights)
+  docs/           # figures + intro slide
+  start.sh        # UI
+  start_faces_edge.sh
+  start_objects_edge.sh
+```
 
 ## One-time setup
 
 ```bash
 cd ~
-git clone https://github.com/moorcheh-ai/moorcheh-face-access.git
-cd moorcheh-face-access
+git clone https://github.com/moorcheh-ai/ShelfIn.git
+cd ShelfIn
 
-# Docker (Ubuntu / Ventuno)
-sudo apt update
-sudo apt install -y docker.io
-sudo usermod -aG docker "$USER"
-# log out/in, then:
+sudo apt update && sudo apt install -y docker.io
+sudo usermod -aG docker "$USER"   # then log out/in
 sudo systemctl enable --now docker
 
 python3 -m venv faceenv
@@ -46,129 +42,54 @@ pip install -U pip
 pip install -r requirements-retail.txt
 
 bash ./scripts/download_models.sh
-ls -lh models/*.onnx
-
-# Place YOLO weights in project root (Torch fallback). Optional: yolov8n.tflite
-# scp yolov8n.pt arduino@<board-ip>:~/moorcheh-face-access/
+# place yolov8n.pt in project root
 ```
 
-Optional Piper (auto-detected by `start.sh` if present):
-
-```text
-~/piper/piper/piper
-~/piper/piper/en_US-lessac-medium.onnx
-```
-
-Otherwise install `espeak-ng` for spoken lines.
-
----
+Optional Piper (auto-detected): `~/piper/piper/piper` + `en_US-lessac-medium.onnx`
 
 ## Every boot
 
-`start.sh` already sets camera (`opencv` / index `0`), object thresholds (`0.38` / `0.55` / `0.03`), `XDG_RUNTIME_DIR`, and Piper when installed. No manual exports needed.
-
 ```bash
-cd ~/moorcheh-face-access
+cd ~/ShelfIn   # or ~/shelfin
 source faceenv/bin/activate
 bash ./start_faces_edge.sh
 bash ./start_objects_edge.sh
 bash ./start.sh
 ```
 
-Open:
+Open **http://127.0.0.1:8501/** or **http://\<board-ip\>:8501/**
 
-- On the board: **http://127.0.0.1:8501/**
-- From another PC: **http://\<board-ip\>:8501/**
+Defaults (no exports needed): OpenCV camera index `0`, object thresholds `0.38` / `0.55` / `0.03`, `XDG_RUNTIME_DIR`, Piper when installed.
 
-### First-run enroll
+## Enroll
 
-**UI:** onboard a person (3–4 photos) and add an item (name, shelf, description, 2–3 photos).
+**UI:** person photos → Insert & authorize; item name / shelf / description / photos → Add item.
 
-**Bulk / backend:**
-
-```bash
-# known_faces/<Name>/*.jpg
-python enroll_faces.py
-
-# known_objects/<Item>/{photos, shelf.txt, description.txt}
-python enroll_objects.py
-```
-
-Clear a store if dimensions / old data conflict:
+**Bulk:**
 
 ```bash
-moorcheh-edge clear-store -y --base-url http://localhost:8083
-moorcheh-edge clear-store -y --base-url http://localhost:8081
+python scripts/enroll_faces.py
+python scripts/enroll_objects.py
 ```
-
----
 
 ## Optional
 
-**External LLM guidance** (default is template - no LLM):
-
 ```bash
+# LiteRT YOLO (export on Mac/x86 only)
+python scripts/export_yolo_litert.py
+
+# External LLM guidance
 export GUIDANCE_MODE=llm
-export LLM_BASE_URL=http://127.0.0.1:11434
-export LLM_MODEL=qwen2.5:0.5b-instruct
 bash ./start.sh
+
+# Windows local UI
+.\scripts\run_access_app.ps1
 ```
-
-**LiteRT YOLO** (export on Mac/x86, not aarch64 Windows/board):
-
-```bash
-python export_yolo_litert.py
-# copy yolov8n.tflite to the board project root
-```
-
-**Camera / audio overrides** (only if defaults fail):
-
-```bash
-export CAMERA_INDEX=2
-export PIPER_BIN=~/piper/piper/piper
-export PIPER_MODEL=~/piper/piper/en_US-lessac-medium.onnx
-```
-
----
-
-## Camera troubleshooting
-
-```bash
-pkill -f access_app || true
-ls -l /dev/video*
-v4l2-ctl --list-devices 2>/dev/null || true
-```
-
-Then retry `bash ./start.sh`, or set `CAMERA_INDEX` to a working device.
-
----
-
-## Environment defaults
-
-| Variable | Default | Meaning |
-|----------|---------|---------|
-| `CAMERA_BACKEND` | `opencv` | USB webcam |
-| `CAMERA_INDEX` | `0` | Webcam index |
-| `OBJECT_MATCH_THRESHOLD` | `0.38` | Known item |
-| `OBJECT_FALLBACK_THRESHOLD` | `0.55` | Center-crop match |
-| `OBJECT_MARGIN` | `0.03` | Gap vs 2nd-best |
-| `GUIDANCE_MODE` | `template` | `template` or `llm` |
-| `PIPER_*` | auto `~/piper/...` | TTS when installed |
-| `XDG_RUNTIME_DIR` | `/run/user/$UID` | Set by `start.sh` when present |
-| `FACE_ACCESS_PORT` | `8501` | UI port |
-| `MOORCHEH_BASE_URL` | `:8083` | Faces Edge |
-| `MOORCHEH_OBJECTS_URL` | `:8081` | Objects Edge |
-
----
 
 ## Ports
 
 | Port | Service |
 |------|---------|
-| **8083** | Moorcheh Edge faces |
-| **8081** | Moorcheh Edge objects |
-| **8501** | ShelfIn web UI |
-| **11434** | Optional Ollama |
-
-More detail: [PROJECT_HUB.md](./PROJECT_HUB.md), [ACCESS_APP.md](./ACCESS_APP.md)  
-Edge docs: [docs.moorcheh.ai/on-edge](https://docs.moorcheh.ai/on-edge)
+| 8083 | Faces Edge |
+| 8081 | Objects Edge |
+| 8501 | ShelfIn UI |

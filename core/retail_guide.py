@@ -22,7 +22,7 @@ import threading
 import time
 from pathlib import Path
 
-ROOT = Path(__file__).resolve().parent
+ROOT = Path(__file__).resolve().parent.parent
 CATALOG_PATH = ROOT / "retail_catalog.json"
 OBJECTS_ROOT = ROOT / "known_objects"
 
