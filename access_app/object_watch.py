@@ -228,9 +228,9 @@ class ObjectWatch:
             if self._client is None:
                 from moorcheh_edge import MoorchehEdgeApiClient
 
-                from access_app.config import OBJECTS_URL
+                from access_app.config import OBJECT_STORE, OBJECTS_URL
 
-                client = MoorchehEdgeApiClient(OBJECTS_URL)
+                client = MoorchehEdgeApiClient(OBJECTS_URL, store=OBJECT_STORE)
                 client.health()
                 self._client = client
                 print(f"[object-watch] objects Edge OK ({OBJECTS_URL})")

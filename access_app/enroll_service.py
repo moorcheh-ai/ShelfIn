@@ -12,7 +12,7 @@ from moorcheh_edge import MoorchehEdgeApiClient, MoorchehEdgeApiError
 
 from core.face_embedder import FaceEmbedder
 
-from access_app.config import BASE_URL, KNOWN_FACES_DIR
+from access_app.config import BASE_URL, FACE_STORE, KNOWN_FACES_DIR
 
 _SAFE_NAME = re.compile(r"[^A-Za-z0-9 _.-]+")
 
@@ -49,7 +49,7 @@ def list_known_people() -> list[dict]:
 
 
 def _edge_client() -> MoorchehEdgeApiClient:
-    client = MoorchehEdgeApiClient(BASE_URL)
+    client = MoorchehEdgeApiClient(BASE_URL, store=FACE_STORE)
     try:
         client.health()
     except MoorchehEdgeApiError as exc:

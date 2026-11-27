@@ -1,4 +1,4 @@
-# Windows-only ShelfIn runner. On Ventuno / Linux use bash ./start.sh
+# Windows-only Visual Memory runner. On Ventuno / Linux use bash ./start.sh
 $ErrorActionPreference = "Stop"
 Set-Location (Split-Path $PSScriptRoot -Parent)
 
@@ -12,8 +12,8 @@ $env:MOORCHEH_BASE_URL = if ($env:MOORCHEH_BASE_URL) { $env:MOORCHEH_BASE_URL } 
 $env:FACE_ACCESS_HOST = if ($env:FACE_ACCESS_HOST) { $env:FACE_ACCESS_HOST } else { "127.0.0.1" }
 $env:FACE_ACCESS_PORT = if ($env:FACE_ACCESS_PORT) { $env:FACE_ACCESS_PORT } else { "8501" }
 
-Write-Host "[shelfin-win] Edge: $($env:MOORCHEH_BASE_URL)"
-Write-Host "[shelfin-win] Camera index: $($env:CAMERA_INDEX)"
-Write-Host "[shelfin-win] UI: http://127.0.0.1:$($env:FACE_ACCESS_PORT)/"
+Write-Host "[visual-memory-win] Edge: $($env:MOORCHEH_BASE_URL)"
+Write-Host "[visual-memory-win] Camera index: $($env:CAMERA_INDEX)"
+Write-Host "[visual-memory-win] UI: http://127.0.0.1:$($env:FACE_ACCESS_PORT)/"
 
 python -m access_app.server

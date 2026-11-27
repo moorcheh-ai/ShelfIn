@@ -19,8 +19,9 @@ from moorcheh_edge import MoorchehEdgeApiClient, MoorchehEdgeApiError
 from core.face_embedder import FaceEmbedder
 
 BASE_URL = os.environ.get("MOORCHEH_BASE_URL", "http://localhost:8083")
+STORE = (os.environ.get("MOORCHEH_FACE_STORE") or "faces").strip() or "faces"
 
-client = MoorchehEdgeApiClient(BASE_URL)
+client = MoorchehEdgeApiClient(BASE_URL, store=STORE)
 
 try:
     health = client.health()

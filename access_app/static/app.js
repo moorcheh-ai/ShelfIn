@@ -59,8 +59,8 @@
         "Camera down"
       );
     } catch (err) {
-      // This is the ShelfIn web server (/api/status), not Moorcheh Edge.
-      message.textContent = "Cannot reach ShelfIn UI API — is ./start.sh running?";
+      // This is the Visual Memory web server (/api/status), not Moorcheh Edge.
+      message.textContent = "Cannot reach Visual Memory UI API - is ./start.sh running?";
       setPill(camPill, false, "Camera OK", "Camera…");
     }
   }

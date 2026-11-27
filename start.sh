@@ -1,9 +1,9 @@
 #!/usr/bin/env bash
-# Start ShelfIn UI (assumes faces Edge is already up on :8083)
+# Start Visual Memory UI (assumes faces Edge is already up on :8083)
 # Usage:
 #   bash ./start_faces_edge.sh    # faces store :8083
 #   bash ./start_objects_edge.sh  # objects store :8081
-#   bash ./start.sh               # ShelfIn UI
+#   bash ./start.sh               # Visual Memory UI
 set -eu
 
 ROOT="$(cd "$(dirname "$0")" && pwd)"
@@ -15,6 +15,8 @@ export CAMERA_BACKEND="${CAMERA_BACKEND:-opencv}"
 export CAMERA_INDEX="${CAMERA_INDEX:-0}"
 export MOORCHEH_BASE_URL="${MOORCHEH_BASE_URL:-http://localhost:8083}"
 export MOORCHEH_OBJECTS_URL="${MOORCHEH_OBJECTS_URL:-http://localhost:8081}"
+export MOORCHEH_FACE_STORE="${MOORCHEH_FACE_STORE:-faces}"
+export MOORCHEH_OBJECT_STORE="${MOORCHEH_OBJECT_STORE:-objects}"
 # Object thresholds (aligned with Moorcheh-Face)
 export OBJECT_MATCH_THRESHOLD="${OBJECT_MATCH_THRESHOLD:-0.38}"
 export OBJECT_FALLBACK_THRESHOLD="${OBJECT_FALLBACK_THRESHOLD:-0.55}"
@@ -63,7 +65,9 @@ fi
 if [[ ! -f faceenv/bin/activate ]]; then
   echo "[start] Missing faceenv/. Create once:"
   echo "  python3 -m venv faceenv && source faceenv/bin/activate"
-  echo "  pip install -r requirements-retail.txt"
+  echo "  pip install -r requirements.txt"
+  echo "  pip install torch torchvision --index-url https://download.pytorch.org/whl/cpu"
+  echo "  pip install ultralytics"
   echo "  bash ./scripts/download_models.sh"
   exit 1
 fi
@@ -95,7 +99,7 @@ echo "[start] Camera: backend=${CAMERA_BACKEND} index=${CAMERA_INDEX}"
 echo "[start] Object thresholds: match=${OBJECT_MATCH_THRESHOLD} fallback=${OBJECT_FALLBACK_THRESHOLD} margin=${OBJECT_MARGIN}"
 
 IP="$(hostname -I 2>/dev/null | awk '{print $1}')"
-echo "[start] ShelfIn:"
+echo "[start] Visual Memory:"
 echo "        http://127.0.0.1:${FACE_ACCESS_PORT}/"
 if [[ -n "${IP}" ]]; then
   echo "        http://${IP}:${FACE_ACCESS_PORT}/"

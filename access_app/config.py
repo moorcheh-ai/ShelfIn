@@ -11,6 +11,9 @@ KNOWN_OBJECTS_DIR = ROOT / "known_objects"
 
 BASE_URL = os.environ.get("MOORCHEH_BASE_URL", "http://localhost:8083").rstrip("/")
 OBJECTS_URL = os.environ.get("MOORCHEH_OBJECTS_URL", "http://localhost:8081").rstrip("/")
+# Edge store names: 1–48 letters, digits, '-' or '_'. Not Docker names like moorcheh-edge-faces.
+FACE_STORE = (os.environ.get("MOORCHEH_FACE_STORE") or "faces").strip() or "faces"
+OBJECT_STORE = (os.environ.get("MOORCHEH_OBJECT_STORE") or "objects").strip() or "objects"
 HOST = os.environ.get("FACE_ACCESS_HOST", "0.0.0.0")
 PORT = int(os.environ.get("FACE_ACCESS_PORT", "8501"))
 

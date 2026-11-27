@@ -10,7 +10,7 @@ import cv2
 import numpy as np
 from moorcheh_edge import MoorchehEdgeApiClient, MoorchehEdgeApiError
 
-from access_app.config import KNOWN_OBJECTS_DIR, OBJECTS_URL
+from access_app.config import KNOWN_OBJECTS_DIR, OBJECT_STORE, OBJECTS_URL
 from core.retail_guide import load_catalog, save_catalog_entry
 
 _SAFE = re.compile(r"[^A-Za-z0-9 _.-]+")
@@ -83,10 +83,11 @@ def enroll_item_images(
     except ImportError as exc:
         raise RuntimeError(
             "Object embedding is not installed in this environment. "
-            "From the repo folder: pip install -r requirements-retail.txt"
+            "From the repo folder: pip install torch torchvision "
+            "--index-url https://download.pytorch.org/whl/cpu && pip install ultralytics"
         ) from exc
 
-    client = MoorchehEdgeApiClient(OBJECTS_URL)
+        client = MoorchehEdgeApiClient(OBJECTS_URL, store=OBJECT_STORE)
     try:
         client.health()
     except MoorchehEdgeApiError as exc:

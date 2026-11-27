@@ -20,8 +20,9 @@ from core.object_embedder import EMBED_DIM, ObjectEmbedder
 from core.retail_guide import save_catalog_entry
 
 BASE_URL = os.environ.get("MOORCHEH_OBJECTS_URL", "http://localhost:8081")
+STORE = (os.environ.get("MOORCHEH_OBJECT_STORE") or "objects").strip() or "objects"
 
-client = MoorchehEdgeApiClient(BASE_URL)
+client = MoorchehEdgeApiClient(BASE_URL, store=STORE)
 
 try:
     health = client.health()
@@ -38,7 +39,7 @@ print(
 if health.get("dimension") not in (None, EMBED_DIM):
     raise RuntimeError(
         f"Objects store dimension is {health.get('dimension')}, expected {EMBED_DIM}. "
-        "Clear it first: moorcheh-edge clear-store -y --base-url http://localhost:8081"
+        "Clear it first: MOORCHEH_EDGE_STORE=objects moorcheh-edge clear-store -y --base-url http://localhost:8081"
     )
 
 embedder = ObjectEmbedder()

@@ -6,8 +6,18 @@ set -euo pipefail
 NAME=moorcheh-edge-faces
 LEGACY_NAME=moorcheh-edge
 PORT=8083
+STORE="${MOORCHEH_FACE_STORE:-faces}"
 DATA_DIR="${HOME}/.moorcheh-edge-faces/data"
+LICENSE_FILE="${HOME}/.moorcheh-edge/license.key"
 IMAGE=moorcheh/moorcheh-edge:latest
+
+if [[ ! -f "$LICENSE_FILE" ]]; then
+  echo "[faces-edge] Missing offline license: $LICENSE_FILE"
+  echo "  Get a free license: https://moorcheh.ai/products/edge/license"
+  echo "  Then: moorcheh-edge license install path/to/license.key"
+  echo "  Or run: moorcheh-edge up   # prompts once, then Ctrl+C after it starts"
+  exit 1
+fi
 
 mkdir -p "$DATA_DIR"
 chmod 777 "$DATA_DIR" 2>/dev/null || true
@@ -24,6 +34,10 @@ if docker ps --format '{{.Names}}' | grep -qx "$NAME"; then
     echo "[faces-edge] '$NAME' already on :8083"
     curl -s "http://localhost:${PORT}/health" || true
     echo
+    curl -s -X POST "http://localhost:${PORT}/stores" \
+      -H "Content-Type: application/json" \
+      -d "{\"name\":\"${STORE}\"}" >/dev/null || true
+    echo "[faces-edge] Store: ${STORE}"
     exit 0
   fi
 fi
@@ -37,9 +51,14 @@ docker run -d \
   --name "$NAME" \
   -p "${PORT}:8080" \
   -v "${DATA_DIR}:/app/data" \
+  -v "${LICENSE_FILE}:/app/license.key:ro" \
   "$IMAGE"
 
 sleep 2
 echo "[faces-edge] API: http://localhost:${PORT}"
 curl -s "http://localhost:${PORT}/health" || true
 echo
+curl -s -X POST "http://localhost:${PORT}/stores" \
+  -H "Content-Type: application/json" \
+  -d "{\"name\":\"${STORE}\"}" >/dev/null || true
+echo "[faces-edge] Store: ${STORE}"

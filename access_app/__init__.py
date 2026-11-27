@@ -1,1 +1,1 @@
-"""ShelfIn — live access + shelf guidance UI + onboarding."""
+"""Visual Memory - live access + shelf guidance UI + onboarding."""

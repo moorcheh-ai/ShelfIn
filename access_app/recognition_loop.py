@@ -16,6 +16,7 @@ from core.face_embedder import FaceEmbedder
 
 from access_app.config import (
     BASE_URL,
+    FACE_STORE,
     CAMERA_HEIGHT,
     CAMERA_INDEX,
     CAMERA_WIDTH,
@@ -122,7 +123,7 @@ class RecognitionLoop:
         if self._embedder is None:
             self._embedder = FaceEmbedder(score_threshold=DETECT_SCORE_THRESHOLD)
         if self._client is None:
-            self._client = MoorchehEdgeApiClient(BASE_URL)
+            self._client = MoorchehEdgeApiClient(BASE_URL, store=FACE_STORE)
             self._client.health()
             self._set_state(edge_ok=True, error=None)
 

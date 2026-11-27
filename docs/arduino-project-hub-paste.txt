@@ -1,0 +1,319 @@
+HOW TO PASTE INTO ARDUINO PROJECT HUB
+1. Open this .txt in Notepad
+2. Ctrl+A, Ctrl+C
+3. Paste into Project Hub
+4. In Project Hub: select each SECTION TITLE line and set it to Heading
+5. Select words you want bold (Visual Memory, ACCESS GRANTED, etc.) and click Bold
+6. Select numbered/bulleted lines and use the list buttons if needed
+7. Upload images where the [IMAGE] notes say
+8. Delete this HOW TO PASTE block before publishing
+
+
+Visual Memory with Moorcheh Edge - How to Remember People and Objects on Ventuno Q
+
+Visual Memory gives edge devices real-time recognition for both people and objects. Enroll a photo of a face or an item, and the live camera stream matches it against local vector embeddings with Moorcheh Edge - triggering actions like unlocking a gate or announcing where a product belongs on a shelf. Everything runs on a single board with no cloud dependency, so biometric and visual data stay private.
+
+
+Overview
+
+Visual Memory runs on Ventuno Q with Moorcheh Edge as the on-device match layer.
+
+A USB webcam watches the scene. The app does two jobs in parallel:
+
+1. Faces - OpenCV YuNet finds faces, SFace builds 128-d embeddings, Moorcheh Edge faces searches the enrolled gallery → ACCESS GRANTED or ACCESS DENIED.
+2. Objects - YOLO proposes boxes, ResNet builds 256-d embeddings, Moorcheh Edge objects searches enrolled items. Only a known match gets a name, shelf, and description. Unknown boxes stay visual-only.
+
+When an item is known, the app builds a short spoken line:
+
+- Template mode (default) - fixed sentence from name + shelf
+- LLM mode (optional) - an external chat LLM (Ollama or OpenAI-compatible) rewrites the same facts already in memory into one natural sentence
+
+Speech uses standalone Piper when installed under ~/piper/, with espeak as fallback. The browser never plays audio; the board speaker does.
+
+Everything that matters for matching stays on the board: models, vectors, and decisions. Spoken guidance does not use Moorcheh /answer or a third Edge RAG store. The optional LLM receives text facts only (already matched name / shelf / description) - never the camera image, and never an unknown detection.
+
+Powered by Moorcheh - PyPI moorcheh-edge, Docker moorcheh/moorcheh-edge, docs at https://docs.moorcheh.ai/on-edge
+
+Repo: https://github.com/moorcheh-ai/ShelfIn
+
+Demo video: Visual Agentic Memory on Edge AI Devices - https://youtu.be/HGj5Ky9hMFs
+
+
+Why Moorcheh
+
+Moorcheh Edge is built for on-device vector search. Visual Memory keeps two Edge stores on the same board:
+
+- Faces - store name faces - port 8083 - container moorcheh-edge-faces - SFace 128-d vectors
+- Objects - store name objects - port 8081 - container moorcheh-edge-objects - ResNet→256-d vectors
+
+On edge hardware this matters:
+
+- Fast similarity search as galleries grow
+- Stable scores you can threshold for GRANT / DENY and known / unknown items
+- No cloud round-trip for identity or product match
+- Same Edge runtime pattern used across Moorcheh on-device projects
+
+YuNet, SFace, YOLO, and ResNet stay in the Python app. Edge is the match layer. Spoken lines use a template or an external LLM; Piper / espeak is the voice layer.
+
+
+Why edge access + shelf guidance?
+
+- Privacy - embeddings and decisions stay on the device
+- Reliability - matching does not depend on internet uptime
+- Latency - detect, embed, and search run on the board
+- Control - you decide thresholds and who / what is enrolled
+- Retail clarity - known items speak a shelf line; unknowns are never invented by the LLM
+- Simple ops - USB-C power, USB camera, browser UI after one-time setup
+
+
+System architecture
+
+End-to-end path from camera to UI and speaker:
+
+[IMAGE: upload docs/figures/architecture-hub.png here]
+
+Diagrams (Figma): https://www.figma.com/design/4ZReJYcUDZaEkj22gzJerR/VENTUNO-Face-Access-%E2%80%94-System-Architecture
+
+Plain-language flow
+
+1. The USB camera sends frames into Visual Memory.
+2. The face path asks: “Do we know this person?” → grant or deny on the screen.
+3. The object path asks: “Is this an enrolled item?” → if yes, use its name, shelf, and description.
+4. If the item is known, build one short sentence (template or external LLM).
+5. Piper / espeak speaks that sentence on the board speaker.
+6. The browser shows the live stream, boxes, and status (Wi-Fi or HDMI).
+
+Unknown objects get a red Unknown box only. They are not sent to the LLM.
+
+Technical flow (faces)
+
+1. Frame (cadence every 3 frames, scale 0.35)
+2. YuNet detect → SFace embed (128-d)
+3. Search Moorcheh Edge faces
+4. Score ≥ FACE_MATCH_THRESHOLD (default 0.28) → ACCESS GRANTED + name
+
+Technical flow (objects)
+
+1. Same camera frame pushed to a side thread (every 3 frames)
+2. YOLO proposes boxes (not names)
+3. ResNet embed (256-d) on each crop
+4. Search Moorcheh Edge objects (top 3, margin 0.03)
+5. Score ≥ OBJECT_MATCH_THRESHOLD (default 0.38) → known name + shelf + description
+6. Else → Unknown (draw only)
+
+Technical flow (guidance + voice)
+
+1. Only known object facts (and optional person name) enter guidance
+2. GUIDANCE_MODE=template → fixed sentence from those facts
+3. GUIDANCE_MODE=llm → external chat LLM with the facts in the prompt; fallback to template if the LLM is down
+4. Standalone Piper (or espeak) speaks the line on the board speaker
+
+
+What runs on Ventuno Q
+
+- Moorcheh Edge faces (Docker) - face vector store + search
+- Moorcheh Edge objects (Docker) - object vector store + search
+- Visual Memory app (FastAPI) - live gate UI, enroll APIs, MJPEG stream
+- YuNet / SFace - face detect + 128-d embed
+- YOLO / ResNet - object box propose (LiteRT .tflite preferred, Torch fallback) + 256-d embed
+- External LLM (optional) - spoken-line rewrite from in-memory facts
+- Piper / espeak - on-device TTS to the speaker
+- USB webcam - live frames (CAMERA_BACKEND=opencv, index 0)
+- Browser / HDMI - GRANT / DENY, item boxes, onboarding
+
+Day-to-day: start faces Edge, start objects Edge, start the UI. Camera, thresholds, audio runtime, and Piper paths are set by start.sh defaults.
+
+
+Enroll faces and objects
+
+Staff enroll people and shelf items once. After that, live recognition can grant access and speak shelf lines.
+
+[IMAGE: upload docs/figures/enroll-faces.png here]
+
+Enroll a person (UI)
+
+1. Open the Visual Memory UI
+2. Under Onboard a person, enter a display name
+3. Drop or choose several photos (JPG / PNG)
+4. Click Insert & authorize
+5. Vectors upload to Moorcheh Edge faces
+
+Enroll an item (UI)
+
+1. Under Add an item, enter name, shelf phrase, and optional description
+2. Drop or choose item photos
+3. Click Add item
+4. Vectors upload to Moorcheh Edge objects
+
+Bulk enroll (backend scripts)
+
+For larger galleries, skip the UI and run scripts:
+
+python scripts/enroll_faces.py
+python scripts/enroll_objects.py
+
+Faces: photos already under known_faces/<Name>/
+Objects: photos + shelf.txt + description.txt under known_objects/<Item>/
+
+Face and object images stay on the device (known_faces/ and known_objects/ are gitignored).
+
+Enroll checklist
+
+1. Faces Edge up (start_faces_edge.sh)
+2. Objects Edge up (start_objects_edge.sh)
+3. Visual Memory UI running (start.sh) - or run the CLI enroll scripts with Edge up
+4. At least one person and one item enrolled
+5. Confirm both lists before relying on live recognition
+
+
+Live recognition
+
+[IMAGE: upload docs/figures/live-recognition.png here]
+
+1. USB camera frame arrives
+2. Face path - YuNet → SFace → Edge faces → ACCESS GRANTED or ACCESS DENIED
+3. Object path - YOLO → ResNet → Edge objects → known item or Unknown
+4. If known → guidance sentence → Piper / espeak on the speaker
+5. UI shows boxes, scores, and gate status
+
+Face grant / deny never depends on the LLM. Unknown objects never go to the LLM.
+
+Defaults (set by start.sh / config.py - no exports required):
+
+- Camera backend - opencv
+- Camera index - 0
+- Face match - 0.28
+- Object match - 0.38
+- Object fallback - 0.55
+- Object margin - 0.03
+- Guidance - template
+- Piper - auto if ~/piper/piper/... exists
+
+
+Features
+
+Entrance / visitor
+
+- Live camera gate with ACCESS GRANTED / DENIED
+- Identity label and similarity score
+- Known item boxes + shelf line
+- Unknown object boxes without inventing names
+- Browser UI over Wi-Fi or HDMI
+
+Staff
+
+- Multi-photo person onboarding
+- Item upload with name, shelf, description
+- Bulk CLI enroll for larger sets
+
+Developers
+
+- Dual Moorcheh Edge stores
+- Optional external LLM guidance + Piper / espeak TTS
+- Scripts: start_faces_edge.sh, start_objects_edge.sh, start.sh, scripts/enroll_faces.py, scripts/enroll_objects.py
+
+
+Hardware requirements
+
+- Ventuno Q - Ubuntu / ARM Linux, Docker capable
+- USB webcam - OpenCV index 0 by default
+- USB sound adapter + speaker - Piper / espeak
+- USB-C power
+- Network - first-time clone / models; UI at http://<board-ip>:8501/
+- Optional: HDMI for local development; USB-C to PC for first SSH (Wi-Fi SSH works too)
+
+
+Software stack
+
+- Face detect - OpenCV YuNet (ONNX)
+- Face embed - OpenCV SFace, 128-d (ONNX)
+- Object propose - Ultralytics YOLOv8n
+- Object embed - ResNet18 → 256-d
+- Vector DB + search - Moorcheh Edge (Docker) × 2
+- Spoken rewrite (optional) - External chat LLM (Ollama / OpenAI-compatible)
+- TTS - Standalone Piper or espeak
+- App / UI - Python FastAPI + static web UI
+- Camera - OpenCV VideoCapture (V4L2)
+
+
+Getting started
+
+One-time setup
+
+1. Clone https://github.com/moorcheh-ai/ShelfIn
+2. Install Docker; add your user to the docker group
+3. Create venv and install deps with CPU Torch (not default PyPI Torch)
+4. Download face models; place yolov8n.pt in the project root
+5. Optional: install Piper under ~/piper/piper/ (otherwise espeak)
+6. Follow README.md for exact commands
+
+On Ventuno Q, do not pip install torch from default PyPI. That pulls NVIDIA CUDA / triton, fills the disk, and leaves fastapi missing.
+
+cd ~
+git clone https://github.com/moorcheh-ai/ShelfIn.git
+cd ShelfIn
+python3 -m venv faceenv && source faceenv/bin/activate
+pip install -U pip
+pip install -r requirements.txt
+pip install torch torchvision --index-url https://download.pytorch.org/whl/cpu
+pip install ultralytics
+python -c "import fastapi, moorcheh_edge, torch; print('ok', torch.__version__)"
+# Free offline license: https://moorcheh.ai/products/edge/license
+# moorcheh-edge license install path/to/license.key
+bash ./scripts/download_models.sh
+# place yolov8n.pt in project root
+
+Every boot (day-to-day)
+
+Camera, thresholds, XDG_RUNTIME_DIR, and Piper autodetection are already defaults in start.sh.
+
+cd ~/ShelfIn
+source faceenv/bin/activate
+bash ./start_faces_edge.sh
+bash ./start_objects_edge.sh
+bash ./start.sh
+
+Open http://127.0.0.1:8501/ on the board, or http://<board-ip>:8501/ from another machine on the same Wi-Fi.
+
+Enroll at least one person and one item (UI or bulk scripts) before the live demo.
+
+Optional overrides
+
+Only if you need them:
+
+# export CAMERA_INDEX=2
+# export GUIDANCE_MODE=llm
+# export PIPER_BIN=~/piper/piper/piper
+# export PIPER_MODEL=~/piper/piper/en_US-lessac-medium.onnx
+
+Edge docs: https://docs.moorcheh.ai/on-edge
+
+
+Ports
+
+- 8083 - Moorcheh Edge faces
+- 8081 - Moorcheh Edge objects
+- 8501 - Visual Memory web UI
+- 11434 - Optional external Ollama (only if GUIDANCE_MODE=llm)
+
+
+Use cases
+
+- Door / lobby face access on Ventuno Q
+- Retail or warehouse shelf guidance for enrolled products
+- Privacy-first demos without cloud face APIs
+- Edge AI proof-of-concept before a fixed install
+
+
+Links
+
+- Visual Memory - https://github.com/moorcheh-ai/ShelfIn
+- Moorcheh Edge - https://github.com/moorcheh-ai/moorcheh-edge
+- Documentation - https://docs.moorcheh.ai/on-edge/
+- Licensing - https://docs.moorcheh.ai/on-edge/licensing
+- License portal - https://moorcheh.ai/products/edge/license
+- PyPI - https://pypi.org/project/moorcheh-edge/
+- Docker Hub - https://hub.docker.com/r/moorcheh/moorcheh-edge
+- Architecture diagrams (Figma) - https://www.figma.com/design/4ZReJYcUDZaEkj22gzJerR/VENTUNO-Face-Access-%E2%80%94-System-Architecture
+- Moorcheh - https://moorcheh.ai
+- Demo video - Visual Agentic Memory on Edge AI Devices - https://youtu.be/HGj5Ky9hMFs

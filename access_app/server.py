@@ -1,4 +1,4 @@
-"""ShelfIn web app - live access + shelf guidance + onboarding."""
+"""Visual Memory web app - live access + shelf guidance + onboarding."""
 
 from __future__ import annotations
 
@@ -41,7 +41,7 @@ async def lifespan(_app: FastAPI):
     loop.stop()
 
 
-app = FastAPI(title="ShelfIn", lifespan=lifespan)
+app = FastAPI(title="Visual Memory", lifespan=lifespan)
 app.mount("/static", StaticFiles(directory=str(STATIC_DIR)), name="static")
 
 

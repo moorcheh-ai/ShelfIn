@@ -1,4 +1,7 @@
+# On Ventuno Q do not `pip install torch` from default PyPI.
+# That pulls NVIDIA CUDA / triton wheels, fills the disk, and leaves
+# fastapi / moorcheh-edge missing. Use README one-time setup:
+#   pip install -r requirements.txt
+#   pip install torch torchvision --index-url https://download.pytorch.org/whl/cpu
+#   pip install ultralytics
 -r requirements.txt
-ultralytics
-torch
-torchvision
